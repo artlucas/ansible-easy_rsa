@@ -16,13 +16,25 @@
   tags:
     - easy_rsa
 
-- name: Create CA directory
+- name: Create CA directory with make-cadir
   become: yes
   command: make-cadir {{ easy_rsa_ca_dir }}
   args:
     creates: "{{ easy_rsa_ca_dir }}"
+  register: create_ca_dir_result
+  ignore_errors: yes
   tags:
     - easy_rsa
+
+- name: Create CA directory manually
+  become: yes
+  command: cp -rf /usr/share/easy-rsa/2.0/* {{ easy_rsa_ca_dir }}
+  args:
+    creates: "{{ easy_rsa_ca_dir }}"
+  when: create_ca_dir_result.rc != 0
+  tags:
+    - easy_rsa
+
 
 - name: Create keys directory
   become: yes
